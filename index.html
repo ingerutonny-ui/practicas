@@ -13,24 +13,24 @@
             font-family: sans-serif; 
         }
         
-        /* Contenedor principal que mantiene todo centrado y relativo */
+        /* Contenedor padre centrado */
         .wrapper { 
             position: relative; 
-            width: 300px; 
-            height: 300px; 
+            width: 350px; 
+            height: 350px; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
         }
 
-        /* Alineación del formulario dentro del círculo */
+        /* El formulario queda justo en el centro del wrapper */
         .login-box { 
             text-align: center; 
             color: white; 
             width: 100%;
+            z-index: 2;
         }
 
-        /* Estilo de los inputs */
         input { 
             display: block; 
             margin: 10px auto; 
@@ -39,10 +39,9 @@
             border: none; 
             background: #253140; 
             color: white; 
-            width: 80%;
+            width: 200px;
         }
 
-        /* Botón de ingreso */
         button { 
             padding: 10px 30px; 
             border-radius: 20px; 
@@ -50,21 +49,21 @@
             background: #00f2ff; 
             cursor: pointer; 
             font-weight: 600; 
-            margin-top: 10px;
         }
 
-        /* Líneas decorativas alrededor */
+        /* Líneas posicionadas absolutamente respecto al wrapper */
         .line { 
             position: absolute; 
-            width: 2px; 
-            height: 15px; 
+            width: 3px; 
+            height: 20px; 
             background: #30475e; 
-            left: 150px; 
-            transform-origin: 0 150px; 
+            left: 174px; /* Centro del contenedor */
+            top: 20px;   /* Distancia del borde */
+            transform-origin: 1px 155px; /* Radio del círculo */
         }
 
-        /* Clase activada por JS al presionar ingreso */
-        .loading .line { background: #00f2ff; transition: 0.5s; }
+        /* Clase aplicada por JS para iluminar */
+        .line.active { background: #00f2ff; box-shadow: 0 0 10px #00f2ff; }
     </style>
 </head>
 <body>
@@ -74,32 +73,41 @@
         <h2>Login</h2>
         <input type="text" id="user" placeholder="USUARIO">
         <input type="password" id="pass" placeholder="CONTRASEÑA">
-        <button onclick="validar()">INGRESO</button>
+        <button onclick="iniciarCarga()">INGRESO</button>
     </div>
 </div>
 
 <script>
-    // Generación dinámica de las líneas radiales
     const circle = document.getElementById('circle');
-    for (let i = 0; i < 40; i++) {
+    const totalLines = 40;
+
+    // Generar las líneas estáticas
+    for (let i = 0; i < totalLines; i++) {
         const line = document.createElement('div');
         line.className = 'line';
         line.style.transform = `rotate(${i * 9}deg)`;
         circle.appendChild(line);
     }
 
-    // Lógica de validación
-    function validar() {
+    function iniciarCarga() {
         const u = document.getElementById('user').value;
         const p = document.getElementById('pass').value;
 
         if (u === "RUBEN" && p === "12345") {
-            circle.classList.add('loading');
-            // Simulación de carga de 5 segundos
-            setTimeout(() => {
-                alert("Acceso concedido");
-                circle.classList.remove('loading');
-            }, 5000);
+            const lines = document.querySelectorAll('.line');
+            let i = 0;
+            // Intervalo para encender línea por línea (5000ms / 40 líneas = 125ms cada una)
+            const interval = setInterval(() => {
+                if (i < lines.length) {
+                    lines[i].classList.add('active');
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    alert("Acceso concedido");
+                    // Resetear para nueva prueba
+                    lines.forEach(l => l.classList.remove('active'));
+                }
+            }, 125);
         } else {
             alert("Usuario o contraseña incorrectos");
         }
