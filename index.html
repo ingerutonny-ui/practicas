@@ -3,40 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* Estilos base para centrar y fondo oscuro */
-        body { background: #1a222e; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
+        body { 
+            background: #1a222e; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: sans-serif; 
+        }
         
-        /* Contenedor del circulo con las lineas radiales */
-        .login-container { position: relative; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
-        .circle-lines { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid transparent; }
-        
-        /* Generador de lineas radiales para el borde */
-        .line { position: absolute; width: 2px; height: 15px; background: #30475e; left: 50%; transform-origin: 0 150px; }
-        
-        /* Animacion de carga que cambia el color de las lineas */
+        /* Contenedor principal que mantiene todo centrado y relativo */
+        .wrapper { 
+            position: relative; 
+            width: 300px; 
+            height: 300px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        /* Alineación del formulario dentro del círculo */
+        .login-box { 
+            text-align: center; 
+            color: white; 
+            width: 100%;
+        }
+
+        /* Estilo de los inputs */
+        input { 
+            display: block; 
+            margin: 10px auto; 
+            padding: 10px; 
+            border-radius: 20px; 
+            border: none; 
+            background: #253140; 
+            color: white; 
+            width: 80%;
+        }
+
+        /* Botón de ingreso */
+        button { 
+            padding: 10px 30px; 
+            border-radius: 20px; 
+            border: none; 
+            background: #00f2ff; 
+            cursor: pointer; 
+            font-weight: 600; 
+            margin-top: 10px;
+        }
+
+        /* Líneas decorativas alrededor */
+        .line { 
+            position: absolute; 
+            width: 2px; 
+            height: 15px; 
+            background: #30475e; 
+            left: 150px; 
+            transform-origin: 0 150px; 
+        }
+
+        /* Clase activada por JS al presionar ingreso */
         .loading .line { background: #00f2ff; transition: 0.5s; }
-        
-        /* Estilos del formulario y inputs */
-        .login-box { z-index: 1; text-align: center; color: white; }
-        input { display: block; margin: 10px auto; padding: 10px; border-radius: 20px; border: none; background: #253140; color: white; }
-        button { padding: 10px 30px; border-radius: 20px; border: none; background: #00f2ff; cursor: pointer; font-weight: 600; }
     </style>
 </head>
 <body>
 
-<div class="login-container" id="circle">
-    <!-- El JavaScript generará las líneas aquí -->
+<div class="wrapper" id="circle">
     <div class="login-box">
         <h2>Login</h2>
-        <input type="text" placeholder="USUARIO">
-        <!-- El atributo type="password" oculta automáticamente el texto con asteriscos -->
-        <input type="password" placeholder="CONTRASEÑA">
-        <button onclick="iniciarSesion()">INGRESO</button>
+        <input type="text" id="user" placeholder="USUARIO">
+        <input type="password" id="pass" placeholder="CONTRASEÑA">
+        <button onclick="validar()">INGRESO</button>
     </div>
 </div>
 
 <script>
-    // Generar 40 líneas alrededor del círculo
+    // Generación dinámica de las líneas radiales
     const circle = document.getElementById('circle');
     for (let i = 0; i < 40; i++) {
         const line = document.createElement('div');
@@ -45,16 +88,21 @@
         circle.appendChild(line);
     }
 
-    // Función de carga al presionar INGRESO
-    function iniciarSesion() {
-        const lines = document.querySelectorAll('.line');
-        circle.classList.add('loading'); // Activa la animación CSS
-        
-        // Simulación de espera de 5 segundos antes de terminar el proceso
-        setTimeout(() => {
-            circle.classList.remove('loading');
-            alert("Revisión completada");
-        }, 5000);
+    // Lógica de validación
+    function validar() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+
+        if (u === "RUBEN" && p === "12345") {
+            circle.classList.add('loading');
+            // Simulación de carga de 5 segundos
+            setTimeout(() => {
+                alert("Acceso concedido");
+                circle.classList.remove('loading');
+            }, 5000);
+        } else {
+            alert("Usuario o contraseña incorrectos");
+        }
     }
 </script>
 
