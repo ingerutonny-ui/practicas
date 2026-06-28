@@ -2,8 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>Botón Animado</title>
     <style>
-        /* Estilos base del botón */
+        /* Estilos base */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1a1a1a;
+            margin: 0;
+        }
+
         .submit {
             cursor: pointer;
             position: relative;
@@ -14,29 +24,26 @@
             background: transparent;
             color: white;
             border: 2px solid white;
-            overflow: hidden; /* Mantiene el color de fondo dentro de los bordes */
-            transition: all 0.5s; /* Suaviza los cambios */
+            overflow: hidden;
+            transition: all 0.5s;
         }
 
-        /* Barra de carga que se expande */
         .submit::after {
             content: "";
             position: absolute;
             top: 0;
             left: 0;
             height: 100%;
-            width: 0; /* Inicia sin relleno */
+            width: 0;
             background: green;
             z-index: -1;
-            transition: width 2s linear; /* Controla la velocidad de llenado */
+            transition: width 2s linear;
         }
 
-        /* Activa el llenado de la barra */
         .submit.processing::after {
             width: 100%;
         }
 
-        /* Estado final cuando termina */
         .submit.submitted {
             background: green;
             border-color: green;
@@ -45,21 +52,16 @@
 </head>
 <body>
 
-    <!-- El botón -->
     <button id="submitBtn" class="submit">Submit</button>
 
     <script>
         const btn = document.getElementById('submitBtn');
 
         btn.addEventListener('click', () => {
-            // Cambia el texto al iniciar
             btn.textContent = "Processing";
-            // Activa la clase que llena la barra con CSS
             btn.classList.add('processing');
 
-            // Simulación de proceso (2 segundos)
             setTimeout(() => {
-                // Quita la carga y aplica el estilo final
                 btn.classList.remove('processing');
                 btn.classList.add('submitted');
                 btn.textContent = "✓ Submitted";
