@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animación de Árbol de Navidad</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #1a222e; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        
+        /* Contenedor principal de la animación */
+        #animation-viewport { position: relative; width: 400px; height: 500px; }
+        
+        /* Contenedor del SVG para centrado */
+        .svg-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        
+        /* Estilos de la ruta del árbol (la línea brillosa) */
+        .tree-path {
+            fill: none;
+            stroke: #00f2ff; /* Color de la línea (brillo azul/cyan) */
+            stroke-width: 3;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 10px #00f2ff); /* Resplandor intenso */
+            
+            /* Preparación para el efecto de dibujo secuencial */
+            stroke-dasharray: 1000; /* Se ajustará dinámicamente con JS */
+            stroke-dashoffset: 1000;
+        }
+
+        /* Estilo del punto de luz que guía el dibujo */
+        #lead-light {
+            fill: #00f2ff;
+            filter: drop-shadow(0 0 15px #00f2ff);
+            opacity: 0; /* Oculto hasta que comience */
+        }
+
+        /* Estilo de la estrella superior (aparece al final) */
+        #top-star {
+            fill: #ffd700; /* Dorado */
+            filter: drop-shadow(0 0 10px #ffd700);
+            opacity: 0;
+            transform-origin: center;
+            transition: opacity 1s, transform 1s;
+        }
+
+        /* Estilos básicos para el sistema de chispas */
+        .sparkle {
+            fill: #00f2ff;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div id="animation-viewport">
+    <svg class="svg-container" viewBox="0 0 200 250">
+        <!-- Definición de la ruta del árbol (las coordenadas) -->
+        <path id="tree-path" class="tree-path" d="M100 25 L85 60 L115 60 L95 90 L125 90 L100 130 L140 130 L100 180 L160 180 M100 25 L115 60 L85 60 L105 90 L75 90 L100 130 L60 130 L100 180 L40 180 M100 180 L100 220 M85 220 L115 220" />
+        
+        <!-- Definición de la estrella superior -->
+        <path id="top-star" d="M100 5 L106 17 L119 19 L110 28 L112 41 L100 35 L88 41 L90 28 L81 19 L94 17 Z" />
+        
+        <!-- Punto de luz que sigue la línea -->
+        <circle id="lead-light" cx="100" cy="25" r="4" />
+        
+        <!-- Grupo para contener las chispas generadas dinámicamente -->
+        <g id="sparkle-group"></g>
+    </svg>
+</div>
+
+<script>
+    const treePath = document.getElementById('tree-path');
+    const leadLight = document.getElementById('lead-light');
+    const sparkleGroup = document.getElementById('sparkle-group');
+    const topStar = document.getElementById('top-star');
+    const pathLength = treePath.getTotalLength(); // Longitud total de la ruta
+    
+    // Configuración inicial del trazado SVG
+    treePath.style.strokeDasharray = pathLength;
+    treePath.style.strokeDashoffset = pathLength;
+
+    // Función principal para iniciar la animación (llamar después de la validación exitosa)
+    function iniciarAnimacion() {
+        treePath.style.transition = 'stroke-dashoffset 5s linear'; // Duración del dibujo
+        treePath.style.strokeDashoffset = '0'; // Comienza el "dibujo"
+        leadLight.style.opacity = '1';
+
+        animateLeadAndSparkles();
+    }
+
+    // Función para manejar el seguimiento del punto de luz y la creación de chispas
+    function animateLeadAndSparkles() {
+        let startTime = null;
+        const duration = 5000; // Misma duración que la transición CSS de la línea
+
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            let progress = (timestamp - startTime) / duration;
+
+            if (progress < 1) {
+                // Calcular la posición actual en la ruta basándose en el tiempo
+                const currentLength = pathLength * progress;
+                const point = treePath.getPointAtLength(currentLength);
+
+                // Actualizar la posición del punto de luz líder
+                leadLight.setAttribute('cx', point.x);
+                leadLight.setAttribute('cy', point.y);
+
+                // Crear una chispa en esta posición
+                crearChispa(point.x, point.y);
+
+                // Solicitar el siguiente fotograma
+                requestAnimationFrame(step);
+            } else {
+                // Animación de línea completada, mostrar estrella superior
+                finalizarAnimacion();
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    // Función para crear una sola chispa con animación CSS aleatoria
+    function crearChispa(x, y) {
+        const sparkle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        sparkle.setAttribute('class', 'sparkle');
+        sparkle.setAttribute('cx', x);
+        sparkle.setAttribute('cy', y);
+        sparkle.setAttribute('r', '1.5'); // Tamaño inicial de la chispa
+
+        // Definir una animación CSS aleatoria y única para cada chispa
+        const angle = Math.random() * Math.PI * 2; // Dirección aleatoria (0-360 grados)
+        const distance = Math.random() * 20 + 5; // Distancia aleatoria a saltar
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+        const duration = Math.random() * 0.5 + 0.5; // Duración aleatoria (0.5s - 1s)
+
+        // Aplicar la animación CSS de salto y desvanecimiento
+        sparkle.style.transition = `transform ${duration}s ease-out, opacity ${duration}s ease-out`;
+        sparkleGroup.appendChild(sparkle);
+
+        // Forzar el redibujado antes de aplicar la transformación para que se vea
+        requestAnimationFrame(() => {
+            sparkle.style.transform = `translate(${dx}px, ${dy}px)`;
+            sparkle.style.opacity = '0'; // Se desvanece
+        });
+
+        // Eliminar la chispa del DOM después de que su animación termine para ahorrar memoria
+        setTimeout(() => {
+            sparkle.remove();
+        }, duration * 1000 + 100);
+    }
+
+    function finalizarAnimacion() {
+        leadLight.style.opacity = '0';
+        topStar.style.opacity = '1';
+        topStar.style.transform = 'scale(1.2)'; // Pequeño efecto de "pulso"
+        
+        setTimeout(() => {
+            topStar.style.transform = 'scale(1)';
+        }, 500);
+    }
+
+    // Integración con tu sistema de validación existente (comenta para probar solo la animación)
+    document.addEventListener('accesoConcedido', iniciarAnimacion);
+
+</script>
+
+</body>
+</html>
