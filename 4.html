@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Botón con Impacto</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1a1a1a;
+            margin: 0;
+        }
+
+        .submit {
+            cursor: pointer;
+            position: relative;
+            padding: 10px 20px;
+            font-size: 36px;
+            width: 250px;
+            border-radius: 4px;
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            overflow: hidden;
+            transition: all 0.5s;
+        }
+
+        .submit::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: green;
+            z-index: -1;
+            transition: width 2s linear;
+        }
+
+        .submit.processing::after {
+            width: 100%;
+        }
+
+        /* Definición de la animación de impacto */
+        @keyframes pop-in {
+            0% { transform: scale(1); opacity: 0.8; } /* Tamaño completo inicial */
+            30% { transform: scale(0.1); opacity: 0.1; } /* Encogimiento rápido al centro */
+            100% { transform: scale(1); opacity: 1; } /* Expansión a tamaño completo con brillo */
+        }
+
+        /* Aplicar la animación al estado final */
+        .submit.submitted {
+            background: green;
+            border-color: green;
+            animation: pop-in 0.6s ease-out; /* Nueva animación activada */
+        }
+    </style>
+</head>
+<body>
+
+    <button id="submitBtn" class="submit">Submit</button>
+
+    <script>
+        const btn = document.getElementById('submitBtn');
+
+        // Escucha el evento clic
+        btn.addEventListener('click', () => {
+            // Cambia el texto al iniciar
+            btn.textContent = "Processing";
+            // Activa la clase que dispara el llenado CSS
+            btn.classList.add('processing');
+
+            // Temporizador para el estado final
+            setTimeout(() => {
+                btn.classList.remove('processing');
+                // Al añadir esta clase, se dispara el @keyframes pop-in
+                btn.classList.add('submitted');
+                btn.textContent = "✓ Submitted";
+            }, 2000); 
+        });
+    </script>
+</body>
+</html>
